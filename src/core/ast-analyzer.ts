@@ -32,6 +32,10 @@ export class ASTAnalyzer {
 
       traverse(ast, {
         VariableDeclarator: (nodePath: NodePath<types.VariableDeclarator>) => {
+          // Skip destructuring patterns (ObjectPattern, ArrayPattern)
+          if (!types.isIdentifier(nodePath.node.id)) {
+            return;
+          }
           const varName = this.extractVariableName(nodePath.node.id);
           if (this.isModelVariableName(varName) && nodePath.node.init) {
             const model = this.extractModel(nodePath.node.init);
@@ -89,7 +93,7 @@ export class ASTAnalyzer {
 
       return selectionPoints;
     } catch (error) {
-      console.warn(`Failed to parse ${filePath}:`, error instanceof Error ? error.message : String(error));
+      console.error(`Failed to parse ${filePath}:`, error instanceof Error ? error.message : String(error));
       return [];
     }
   }
@@ -111,6 +115,11 @@ export class ASTAnalyzer {
     return null;
   }
 
+  /**
+   * Checks if a variable name suggests it contains a model/provider.
+   * Matches: 'model', 'provider', 'modelid', or any name containing 'model'/'provider'.
+   * Note: Template literals and dynamic model selection are not supported.
+   */
   private isModelVariableName(name: string | null): boolean {
     if (!name) return false;
     const lower = name.toLowerCase();
@@ -123,16 +132,18 @@ export class ASTAnalyzer {
     );
   }
 
+  /**
+   * Extracts model name from various expression types.
+   * Handles: string literals, identifiers, and function calls with string args.
+   * Note: Template literals (e.g., `${model}-turbo`) are not analyzed for
+   * performance reasons - dynamic model selection at runtime cannot be statically analyzed.
+   */
   private extractModel(node: types.Node | null | undefined): string | null {
     if (!node) return null;
 
     if (types.isStringLiteral(node)) {
       const value = node.value;
       if (isModelName(value)) {
-        return value;
-      }
-      // Check if string matches known models even if not in exact list
-      if (KNOWN_MODELS.some(m => m === value)) {
         return value;
       }
     }
@@ -148,7 +159,7 @@ export class ASTAnalyzer {
       // Try to extract from function call arguments
       if (node.arguments.length > 0) {
         const firstArg = node.arguments[0];
-        if (types.isStringLiteral(firstArg)) {
+        if (types.isStringLiteral(firstArg) && isModelName(firstArg.value)) {
           return firstArg.value;
         }
       }
