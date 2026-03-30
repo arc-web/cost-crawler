@@ -16,4 +16,15 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // Export all types for library usage
 __exportStar(require("./core/types"), exports);
+__exportStar(require("./core/ast-analyzer"), exports);
+__exportStar(require("./core/cost-registry"), exports);
+__exportStar(require("./core/patterns"), exports);
+__exportStar(require("./core/crawler"), exports);
+__exportStar(require("./core/dependency-tracer"), exports);
+__exportStar(require("./core/analyzer"), exports);
+// Export reporters
+__exportStar(require("./reporters/cli-reporter"), exports);
+__exportStar(require("./reporters/json-reporter"), exports);
+// Export plugins
+__exportStar(require("./plugins/plugin-registry"), exports);
 //# sourceMappingURL=index.js.map

@@ -6,6 +6,7 @@ export interface ModelSelectionPoint {
   type: 'config' | 'env' | 'hardcoded' | 'conditional' | 'function_param' | 'dependency';
   selectedModel: string;
   costTier: 'free' | 'paid' | 'mixed' | 'unknown';
+  availableModels: string[];
   condition?: string;
   source?: string;
 }
@@ -39,10 +40,9 @@ export interface DependencyChain {
 
 export interface AnalysisResult {
   repoPath: string;
-  timestamp: number;
+  timestamp: string;
   selectionPoints: ModelSelectionPoint[];
   dependencyChains: DependencyChain[];
-  costProfiles: Record<string, CostProfile>;
   recommendations: Recommendation[];
   smokeTestResults?: SmokeTestResult[];
 }
@@ -50,20 +50,16 @@ export interface AnalysisResult {
 export interface Recommendation {
   id: string;
   severity: 'info' | 'warning' | 'critical';
-  title: string;
-  description: string;
-  affectedFiles: string[];
-  suggestedAction: string;
+  message: string;
+  affected: string[];
+  suggestedAction?: string;
   estimatedSavings?: number;
 }
 
 export interface SmokeTestResult {
-  testType: 'trace' | 'simulate';
-  scenario: string;
-  modelsUsed: string[];
-  estimatedCost: number;
-  status: 'pass' | 'fail' | 'inconclusive';
-  evidence: string;
+  name: string;
+  passed: boolean;
+  message?: string;
 }
 
 export interface CostCrawlerConfig {
@@ -72,5 +68,6 @@ export interface CostCrawlerConfig {
   costRegistry?: Record<string, CostProfile>;
   plugins?: string[]; // Plugin names to enable
   runSmokeTests?: boolean;
+  smokeTestResults?: SmokeTestResult[];
   outputFormat?: 'json' | 'cli' | 'csv';
 }

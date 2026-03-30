@@ -48,6 +48,7 @@ export class ASTAnalyzer {
                 type: 'hardcoded',
                 selectedModel: model,
                 costTier: this.determineCostTier([model]),
+                availableModels: [model],
               });
             }
           }
@@ -66,6 +67,7 @@ export class ASTAnalyzer {
                 type: 'config',
                 selectedModel: model,
                 costTier: this.determineCostTier([model]),
+                availableModels: [model],
               });
             }
           }
@@ -85,6 +87,7 @@ export class ASTAnalyzer {
               type: 'conditional',
               selectedModel: defaultModel || models[0],
               costTier: this.determineCostTier(models),
+              availableModels: models,
               condition: 'ternary-operator',
             });
           }

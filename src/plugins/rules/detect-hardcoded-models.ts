@@ -43,9 +43,8 @@ export class DetectHardcodedModelsRule implements IRule {
       recommendations.push({
         id: `rec_hardcoded_${recId++}`,
         severity: 'warning',
-        title: `Hardcoded expensive model: ${model}`,
-        description: `Found hardcoded usage of expensive model ${model} in ${pointsList.length} location(s). Consider using environment variables or configuration for model selection.`,
-        affectedFiles: uniqueFiles,
+        message: `Found hardcoded usage of expensive model ${model} in ${pointsList.length} location(s). Consider using environment variables or configuration for model selection.`,
+        affected: uniqueFiles,
         suggestedAction: `Replace hardcoded ${model} with a configurable model selection mechanism.`,
         estimatedSavings: pointsList.length * 100, // Rough estimate
       });

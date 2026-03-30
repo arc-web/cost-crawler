@@ -34,9 +34,8 @@ export class CostOptimizationRecommender implements IRecommender {
       recommendations.push({
         id: `rec_consolidate_${recId++}`,
         severity: 'warning',
-        title: 'Multiple expensive models detected',
-        description: `Found ${models.length} different expensive models (${models.join(', ')}) used across ${files.length} files. Consider consolidating to a single model for cost efficiency.`,
-        affectedFiles: files,
+        message: `Found ${models.length} different expensive models (${models.join(', ')}) used across ${files.length} files. Consider consolidating to a single model for cost efficiency.`,
+        affected: files,
         suggestedAction: `Consolidate usage to a single cost-efficient model like claude-3-haiku or gpt-3.5-turbo.`,
         estimatedSavings: expensivePoints.length * 50, // Rough estimate per point
       });
@@ -56,9 +55,8 @@ export class CostOptimizationRecommender implements IRecommender {
         recommendations.push({
           id: `rec_file_concentration_${recId++}`,
           severity: 'info',
-          title: `High model selection concentration in ${file}`,
-          description: `File ${file} contains ${count} expensive model selections. Consider refactoring to use a single model selector.`,
-          affectedFiles: [file],
+          message: `File ${file} contains ${count} expensive model selections. Consider refactoring to use a single model selector.`,
+          affected: [file],
           suggestedAction: `Refactor model selection logic to centralize decision-making.`,
           estimatedSavings: count * 25,
         });
