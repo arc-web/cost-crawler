@@ -2,6 +2,8 @@ import { CostProfile } from './types';
 
 export class CostRegistry {
   private profiles: Map<string, CostProfile> = new Map();
+  private readonly TOKENS_PER_HOUR = 1_000_000;
+  private readonly CALLS_PER_HOUR = 100;
 
   constructor(customProfiles?: Record<string, CostProfile>) {
     this.initializeDefaults();
@@ -62,6 +64,30 @@ export class CostRegistry {
         provider: 'OpenAI',
         estimatedMonthlyIfActive: 15,
       },
+      'claude-3-haiku': {
+        model: 'claude-3-haiku',
+        tier: 'free',
+        costPerUnit: 0,
+        unit: 'token',
+        provider: 'Anthropic',
+        estimatedMonthlyIfActive: 0,
+      },
+      'llama2': {
+        model: 'llama2',
+        tier: 'free',
+        costPerUnit: 0,
+        unit: 'token',
+        provider: 'Local',
+        estimatedMonthlyIfActive: 0,
+      },
+      'mixtral': {
+        model: 'mixtral',
+        tier: 'free',
+        costPerUnit: 0,
+        unit: 'token',
+        provider: 'Local',
+        estimatedMonthlyIfActive: 0,
+      },
     };
 
     Object.entries(defaults).forEach(([model, profile]) => {
@@ -70,6 +96,9 @@ export class CostRegistry {
   }
 
   register(model: string, profile: CostProfile): void {
+    if (!profile.model || profile.costPerUnit < 0) {
+      throw new Error(`Invalid CostProfile: ${profile.model}`);
+    }
     this.profiles.set(model, profile);
   }
 
@@ -89,11 +118,7 @@ export class CostRegistry {
   }
 
   getAll(): Record<string, CostProfile> {
-    const result: Record<string, CostProfile> = {};
-    this.profiles.forEach((profile, model) => {
-      result[model] = profile;
-    });
-    return result;
+    return Object.fromEntries(this.profiles);
   }
 
   costDelta(modelA: string, modelB: string): number {
@@ -101,7 +126,9 @@ export class CostRegistry {
     const profileB = this.get(modelB);
 
     if (!profileA || !profileB) {
-      return 0;
+      throw new Error(
+        `CostProfile not found: ${!profileA ? modelA : modelB}`
+      );
     }
 
     // Normalize to hourly cost for comparison
@@ -117,11 +144,11 @@ export class CostRegistry {
         return profile.costPerUnit;
       case 'token':
         // Assume ~1M tokens per hour as a standard metric
-        return (profile.costPerUnit * 1000000) / 1;
+        return profile.costPerUnit * this.TOKENS_PER_HOUR;
       case 'call':
       case 'request':
         // Assume ~100 calls per hour
-        return profile.costPerUnit * 100;
+        return profile.costPerUnit * this.CALLS_PER_HOUR;
       default:
         return 0;
     }
