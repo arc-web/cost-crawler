@@ -4,10 +4,14 @@
   "description": "Codebase analyzer for identifying model/provider selection mechanisms and cost implications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "cost-crawler": "bin/cost-crawler.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "ts-node",
     "test": "jest",
+    "cli": "node bin/cost-crawler.js",
     "start": "node dist/index.js"
   },
   "keywords": [
