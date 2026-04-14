@@ -6,13 +6,8 @@ module.exports = {
   testMatch: ['**/tests/**/*.test.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
+  setupFiles: ['<rootDir>/jest-setup.js'],
   testEnvironmentOptions: {
-    autoUseFakeTimers: false,
-    localstoragePath: path.join(__dirname, '.jest-localStorage'),
-  },
-  globals: {
-    'ts-jest': {
-      isolatedModules: true,
-    },
+    localstoragePath: path.join(__dirname, '.jest-tmp-localStorage'),
   },
 };
